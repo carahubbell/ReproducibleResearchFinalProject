@@ -1,7 +1,7 @@
 
 # Download and read the data
-download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2",
-              destfile="StormData.csv.bz2")
+#download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2",
+              #destfile="StormData.csv.bz2")
 data<-read.csv("StormData.csv.bz2")
 
 #Find out what we have
@@ -32,12 +32,13 @@ data$totalCrop[which(data$CROPDMGEXP=="B")]<-data$CROPDMG[which(data$CROPDMGEXP=
 #We will look at FATALITIES and INJURIES by EVTYPE
 
 #Create a new var of total people harmed
-data$totalHarmed<-rowSums(data[,c("FATALITIES","INJURIES")])
+data$totalHarmed<-data$FATALITIES+data$INJURIES
 
 #Find the sum of totalHarmed across each EVTYPE and make a df
 x<-tapply(data$totalHarmed, data$EVTYPE, sum, na.rm=TRUE)
 EVTYPES<-unique(data$EVTYPE)
 x<-data.frame(EVTYPE=EVTYPES, totalHarmed=as.numeric(x))
+require(dplyr)
 x<-arrange(x, desc(totalHarmed))
 
 #Look at the top six most harmful event types
