@@ -42,12 +42,6 @@ str(data)
 
 The data set consists of 902297 observations. Each observation is one storm event. We use the terms observation and event interchangeably.
 
-To protect our raw data, we write it to a new CSV file in the working directory.
-
-```{r, echo=TRUE}
-write.csv(data, file="StormData.csv")
-```
-
 ###Analysis 
 
 First, we will investigate which types of storm events have had the greatest impact on humans. From ```str(data)``` and from the documentation files, we know that  the variables ```FATALITIES``` and ```INJURIES``` represent the total number of reported human deaths and injuries respectively for each storm event.
@@ -60,7 +54,7 @@ data$totalHarmed<-data$FATALITIES+data$INJURIES
 
 Since we are interested in knowing the storm type (```EVTYPE```) that has caused the most harm to humans, we find the sum of ```totalHarmed``` within each ```EVTYPE``` and then reorder the data set with ```totalHarmed``` in descending order.
 
-```{r,. echo=TRUE}
+```{r, echo=TRUE}
 x<-tapply(data$totalHarmed, data$EVTYPE, sum, na.rm=TRUE)
 EVTYPES<-unique(data$EVTYPE)
 x<-data.frame(EVTYPE=EVTYPES, totalHarmed=as.numeric(x))
@@ -106,13 +100,13 @@ The next question we will investigate is what storm event type has had the great
 To analyze the total economic impact of each storm type, two new variables are created: ```totalProp``` which represents the total value of property damage measured in thousands of dollars and ```totalCrop``` which represents the total value of agricultural damage measured in thousands of dollars
 
 ```{r, echo=TRUE}
-data$totalProp[which(data$PROPDMGEXP=="")]<-0
+data$totalProp[which(data$PROPDMGEXP!="K" | data$PROPDMGEXP!="M" | data$PROPDMGEXP!="B")]<-0
 data$totalProp[which(data$PROPDMGEXP=="K")]<-data$PROPDMG[which(data$PROPDMGEXP=="K")]
 data$totalProp[which(data$PROPDMGEXP=="M")]<-data$PROPDMG[which(data$PROPDMGEXP=="M")]*1000
 data$totalProp[which(data$PROPDMGEXP=="B")]<-data$PROPDMG[which(data$PROPDMGEXP=="B")]*1000000
 
 
-data$totalCrop[which(data$CROPDMGEXP=="")]<-0
+data$totalCrop[which(data$CROPDMGEXP!="K" | data$CROPDMGEXP!="M" | data$CROPDMGEXP!="B")]<-0
 data$totalCrop[which(data$CROPDMGEXP=="K")]<-data$CROPDMG[which(data$CROPDMGEXP=="K")]
 data$totalCrop[which(data$CROPDMGEXP=="M")]<-data$CROPDMG[which(data$CROPDMGEXP=="M")]*1000
 data$totalCrop[which(data$CROPDMGEXP=="B")]<-data$CROPDMG[which(data$CROPDMGEXP=="B")]*1000000

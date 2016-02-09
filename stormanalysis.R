@@ -12,14 +12,14 @@ write.csv(data, file="StormData.csv")
 
 #Find total Property Damage for each obs in K $
 
-data$totalProp[which(data$PROPDMGEXP=="")]<-0
+data$totalProp[which(data$PROPDMGEXP!="K" & data$PROPDMGEXP!="M" & data$PROPDMGEXP!="B")]<-0
 data$totalProp[which(data$PROPDMGEXP=="K")]<-data$PROPDMG[which(data$PROPDMGEXP=="K")]
 data$totalProp[which(data$PROPDMGEXP=="M")]<-data$PROPDMG[which(data$PROPDMGEXP=="M")]*1000
 data$totalProp[which(data$PROPDMGEXP=="B")]<-data$PROPDMG[which(data$PROPDMGEXP=="B")]*1000000
 
 #Find total crop damage for each obs in K $
 
-data$totalCrop[which(data$CROPDMGEXP=="")]<-0
+data$totalCrop[which(data$CROPDMGEXP!="K" & data$CROPDMGEXP!="M" & data$CROPDMGEXP!="B")]<-0
 data$totalCrop[which(data$CROPDMGEXP=="K")]<-data$CROPDMG[which(data$CROPDMGEXP=="K")]
 data$totalCrop[which(data$CROPDMGEXP=="M")]<-data$CROPDMG[which(data$CROPDMGEXP=="M")]*1000
 data$totalCrop[which(data$CROPDMGEXP=="B")]<-data$CROPDMG[which(data$CROPDMGEXP=="B")]*1000000
