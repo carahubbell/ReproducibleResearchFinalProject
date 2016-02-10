@@ -1,25 +1,34 @@
 
+require(dplyr)
+
 # Download and read the data
 #download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2",
               #destfile="StormData.csv.bz2")
-data<-read.csv("StormData.csv.bz2")
+#data<-read.csv("StormData.csv.bz2")
 
 #Find out what we have
 str(data)
 
+invisible(readline(prompt="Press [enter] to continue"))
+
 #Store original, unedited data as csv
-write.csv(data, file="StormData.csv")
+#write.csv(data, file="StormData.csv")
+
+#Clean up EVTYPE names
+data$EVTYPE<-tolower(data$EVTYPE)
 
 #Find total Property Damage for each obs in K $
 
-data$totalProp[which(data$PROPDMGEXP!="K" & data$PROPDMGEXP!="M" & data$PROPDMGEXP!="B")]<-0
+data$totalProp<-0
+
 data$totalProp[which(data$PROPDMGEXP=="K")]<-data$PROPDMG[which(data$PROPDMGEXP=="K")]
 data$totalProp[which(data$PROPDMGEXP=="M")]<-data$PROPDMG[which(data$PROPDMGEXP=="M")]*1000
 data$totalProp[which(data$PROPDMGEXP=="B")]<-data$PROPDMG[which(data$PROPDMGEXP=="B")]*1000000
 
 #Find total crop damage for each obs in K $
 
-data$totalCrop[which(data$CROPDMGEXP!="K" & data$CROPDMGEXP!="M" & data$CROPDMGEXP!="B")]<-0
+data$totalCrop<-0
+
 data$totalCrop[which(data$CROPDMGEXP=="K")]<-data$CROPDMG[which(data$CROPDMGEXP=="K")]
 data$totalCrop[which(data$CROPDMGEXP=="M")]<-data$CROPDMG[which(data$CROPDMGEXP=="M")]*1000
 data$totalCrop[which(data$CROPDMGEXP=="B")]<-data$CROPDMG[which(data$CROPDMGEXP=="B")]*1000000
@@ -33,12 +42,14 @@ data$totalCrop[which(data$CROPDMGEXP=="B")]<-data$CROPDMG[which(data$CROPDMGEXP=
 
 #Create a new var of total people harmed
 data$totalHarmed<-data$FATALITIES+data$INJURIES
+data<-arrange(data, EVTYPE)
+EVTYPES<-unique(data$EVTYPE)
 
 #Find the sum of totalHarmed across each EVTYPE and make a df
 x<-tapply(data$totalHarmed, data$EVTYPE, sum, na.rm=TRUE)
-EVTYPES<-unique(data$EVTYPE)
+
 x<-data.frame(EVTYPE=EVTYPES, totalHarmed=as.numeric(x))
-require(dplyr)
+
 x<-arrange(x, desc(totalHarmed))
 
 #Look at the top six most harmful event types
@@ -57,13 +68,15 @@ legend("topright",
        fill=rainbow(6, s = 1, v = 1, start = .5, end = .75, alpha = 1)
        )
 
+invisible(readline(prompt="Press [enter] to continue"))
+
 #---------------------------------------------
 
 #What types of events have the greatest economic impact?
 #Need to look at PROPDMG and CROPDMG by EVTYPE
 
 #Create a new var of total damage
-data$totalDamage<-rowSums(data[,c("totalProp","totalCrop")])
+data$totalDamage<-data$totalProp+data$totalCrop
 
 #Find the sum of totalDamage across each EVTYPE and make a df
 y<-tapply(data$totalDamage, data$EVTYPE, sum, na.rm=TRUE)
